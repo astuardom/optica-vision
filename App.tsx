@@ -12,7 +12,8 @@ import Login from './pages/Login';
 import AdminDashboard from './pages/AdminDashboard';
 import { Page, Prescription, Appointment } from './types';
 import { auth } from './services/firebaseService';
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { onAuthStateChanged } from "firebase/auth";
+
 
 const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<Page>(Page.HOME);
@@ -25,7 +26,7 @@ const App: React.FC = () => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       setAuthLoaded(true);
-      
+
       // Si el usuario deja de estar autenticado y está en la página de administración,
       // lo enviamos de vuelta al inicio.
       if (!currentUser && currentPage === Page.ADMIN) {

@@ -1,7 +1,8 @@
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, getDocs, query, orderBy, serverTimestamp, doc, updateDoc, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { initializeApp } from "firebase/app";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "firebase/auth";
+import { getFirestore, collection, addDoc, getDocs, query, orderBy, serverTimestamp, doc, updateDoc, onSnapshot, deleteDoc } from "firebase/firestore";
+
 
 const firebaseConfig = {
   apiKey: "AIzaSyAbtFGhrRYKREkEuV1wWgc1VTFrsstllV4",
@@ -138,9 +139,9 @@ export const deleteMessage = async (id: string) => {
  * CLOUDINARY UPLOAD
  */
 export const uploadToCloudinary = async (file: File) => {
-  const CLOUD_NAME = "dfqdd2nja"; 
-  const UPLOAD_PRESET = "optica"; 
-  
+  const CLOUD_NAME = "dfqdd2nja";
+  const UPLOAD_PRESET = "optica";
+
   const formData = new FormData();
   formData.append('file', file);
   formData.append('upload_preset', UPLOAD_PRESET);
@@ -150,14 +151,14 @@ export const uploadToCloudinary = async (file: File) => {
       method: 'POST',
       body: formData,
     });
-    
+
     const responseData = await response.json();
-    
+
     if (!response.ok) {
       const errorMsg = responseData.error?.message || "Error desconocido";
       throw new Error(`Cloudinary falló: ${errorMsg}`);
     }
-    
+
     return responseData.secure_url;
   } catch (error: any) {
     console.error("Error crítico en uploadToCloudinary:", error);
