@@ -1,0 +1,7 @@
+{
+  "name": "Copy of Óptica Visión ",
+  "description": "Una plataforma integral para servicios de óptica que permite cotizar recetas, agendar exámenes visuales y gestionar citas con especialistas de forma intuitiva y moderna.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
