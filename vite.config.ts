@@ -43,6 +43,11 @@ export default defineConfig(({ mode }) => {
         }
       })
     ],
+    define: {
+      'process.env.APPSCRIPT_KEY': JSON.stringify(env.APPSCRIPT_KEY)
+    },
+
+
 
     resolve: {
       alias: {

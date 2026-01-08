@@ -1,7 +1,6 @@
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Page, Prescription } from '../types';
-import { getSmartRecommendation } from '../services/geminiService';
 
 interface QuoteResultProps {
   prescription: Prescription | null;
@@ -9,13 +8,7 @@ interface QuoteResultProps {
 }
 
 const QuoteResult: React.FC<QuoteResultProps> = ({ prescription, onNavigate }) => {
-  const [recommendation, setRecommendation] = useState<string>('');
 
-  useEffect(() => {
-    if (prescription) {
-      getSmartRecommendation(prescription).then(setRecommendation);
-    }
-  }, [prescription]);
 
   if (!prescription) {
     return (
@@ -37,44 +30,45 @@ const QuoteResult: React.FC<QuoteResultProps> = ({ prescription, onNavigate }) =
         </div>
 
         <div className="bg-white border border-gray-100 rounded-[40px] shadow-xl overflow-hidden mb-8 p-8 md:p-12 space-y-10">
-            <div className="grid grid-cols-3 gap-4 text-center">
-              <div className="p-4 bg-gray-50 rounded-2xl">
-                <span className="text-[8px] font-black text-text-sub uppercase block">TIPO</span>
-                <p className="font-bold text-sm">{prescription.tipoLente}</p>
-              </div>
-              <div className="p-4 bg-gray-50 rounded-2xl">
-                <span className="text-[8px] font-black text-text-sub uppercase block">MATERIAL</span>
-                <p className="font-bold text-sm">{prescription.material}</p>
-              </div>
-              <div className="p-4 bg-blue-50 text-primary rounded-2xl">
-                <span className="text-[8px] font-black uppercase block">D.P.</span>
-                <p className="font-bold text-sm">{prescription.distancia_pupilar || 'S/D'}</p>
-              </div>
+          <div className="grid grid-cols-3 gap-4 text-center">
+            <div className="p-4 bg-gray-50 rounded-2xl">
+              <span className="text-[8px] font-black text-text-sub uppercase block">TIPO</span>
+              <p className="font-bold text-sm">{prescription.tipoLente}</p>
             </div>
+            <div className="p-4 bg-gray-50 rounded-2xl">
+              <span className="text-[8px] font-black text-text-sub uppercase block">MATERIAL</span>
+              <p className="font-bold text-sm">{prescription.material}</p>
+            </div>
+            <div className="p-4 bg-blue-50 text-primary rounded-2xl">
+              <span className="text-[8px] font-black uppercase block">D.P.</span>
+              <p className="font-bold text-sm">{prescription.distancia_pupilar || 'S/D'}</p>
+            </div>
+          </div>
 
-            <div className="border border-gray-100 rounded-2xl overflow-hidden">
-                <div className="grid grid-cols-4 text-center bg-gray-50 py-3 text-[10px] font-black text-text-sub">
-                  <div>LADO</div><div>ESFERA</div><div>CILINDRO</div><div>EJE</div>
-                </div>
-                <div className="grid grid-cols-4 text-center py-4 text-sm font-bold border-t border-gray-100">
-                  <div className="text-primary">OD</div><div>{prescription.od_esfera || '0.00'}</div><div>{prescription.od_cilindro || '0.00'}</div><div>{prescription.od_eje || '0'}°</div>
-                </div>
-                <div className="grid grid-cols-4 text-center py-4 text-sm font-bold border-t border-gray-100">
-                  <div className="text-primary">OI</div><div>{prescription.oi_esfera || '0.00'}</div><div>{prescription.oi_cilindro || '0.00'}</div><div>{prescription.oi_eje || '0'}°</div>
-                </div>
+          <div className="border border-gray-100 rounded-2xl overflow-hidden">
+            <div className="grid grid-cols-4 text-center bg-gray-50 py-3 text-[10px] font-black text-text-sub">
+              <div>LADO</div><div>ESFERA</div><div>CILINDRO</div><div>EJE</div>
             </div>
+            <div className="grid grid-cols-4 text-center py-4 text-sm font-bold border-t border-gray-100">
+              <div className="text-primary">OD</div><div>{prescription.od_esfera || '0.00'}</div><div>{prescription.od_cilindro || '0.00'}</div><div>{prescription.od_eje || '0'}°</div>
+            </div>
+            <div className="grid grid-cols-4 text-center py-4 text-sm font-bold border-t border-gray-100">
+              <div className="text-primary">OI</div><div>{prescription.oi_esfera || '0.00'}</div><div>{prescription.oi_cilindro || '0.00'}</div><div>{prescription.oi_eje || '0'}°</div>
+            </div>
+          </div>
 
-            <div className="p-6 bg-blue-50/50 rounded-3xl border border-blue-100 italic text-sm text-text-main">
-               "{recommendation || "Generando recomendación..."}"
-            </div>
+          <p className="text-center text-text-sub text-sm font-medium">
+            Nuestros asesores revisarán tu receta y se contactarán contigo a la brevedad.
+          </p>
         </div>
+
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
           <a href={prescription.whatsappUrl} target="_blank" className="h-16 bg-[#25D366] text-white font-black rounded-2xl flex items-center justify-center gap-3">
             <span className="material-symbols-outlined">chat</span> WhatsApp Asesor
           </a>
           <button onClick={() => onNavigate(Page.BOOKING)} className="h-16 bg-primary text-white font-black rounded-2xl">
-             Agendar Examen
+            Agendar Examen
           </button>
         </div>
       </div>
