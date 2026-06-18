@@ -220,7 +220,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
             />
           ) : (
             <>
-              <div className="bg-white p-2 rounded-2xl border border-slate-100 shadow-sm inline-flex items-center gap-1">
+              <div className="w-full overflow-x-auto pb-1 custom-scrollbar">
+                <div className="bg-white p-1.5 sm:p-2 rounded-2xl border border-slate-100 shadow-sm inline-flex min-w-max items-center gap-1">
                 <FilterBtn active={statusFilter === 'all'} label="Todos" onClick={() => setStatusFilter('all')} />
                 {activeTab === 'quotes' && (
                   <>
@@ -235,6 +236,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                     <FilterBtn active={statusFilter === 'read'} label="Leídos" onClick={() => setStatusFilter('read')} />
                   </>
                 )}
+                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 animate-fade-in">
@@ -452,7 +454,7 @@ const StatCard = ({ icon, label, value, color, bg }: any) => (
 const FilterBtn = ({ active, label, onClick }: any) => (
   <button 
     onClick={onClick} 
-    className={`px-5 py-2.5 rounded-xl text-xs font-black transition-all ${
+    className={`shrink-0 whitespace-nowrap px-3.5 sm:px-5 py-2.5 rounded-xl text-[11px] sm:text-xs font-black transition-all ${
       active ? 'bg-slate-900 text-white shadow-lg' : 'text-slate-400 hover:text-slate-900'
     }`}
   >
