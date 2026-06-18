@@ -80,9 +80,11 @@ const CalendarView: React.FC<CalendarViewProps> = ({ appointments, onSelectAppoi
   };
 
   const getPillColor = (status: string = 'pendiente') => {
-    if (status === 'realizado') return 'bg-blue-500 hover:bg-blue-600'; // Azul fuerte (como en la imagen)
-    if (status === 'pendiente') return 'bg-blue-400 hover:bg-blue-500 opacity-80'; // Azul más claro
-    if (status === 'no_asistio') return 'bg-rose-500 hover:bg-rose-600';
+    const normalizedStatus = status.trim().toLowerCase();
+
+    if (normalizedStatus === 'realizado') return 'bg-emerald-500 hover:bg-emerald-600';
+    if (normalizedStatus === 'pendiente') return 'bg-blue-400 hover:bg-blue-500 opacity-80';
+    if (normalizedStatus === 'no_asistio') return 'bg-rose-500 hover:bg-rose-600';
     return 'bg-slate-400 hover:bg-slate-500';
   };
 

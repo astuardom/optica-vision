@@ -206,7 +206,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <div className="grid grid-cols-3 gap-2 sm:gap-6">
                <StatCard icon="pending_actions" label="Cotizaciones Pendientes" value={stats.pendingQuotes} color="text-primary" bg="bg-blue-50" />
                <StatCard icon="event_upcoming" label="Citas para Hoy" value={stats.todayAppointments} color="text-amber-500" bg="bg-amber-50" />
                <StatCard icon="mark_chat_unread" label="Nuevos Mensajes" value={stats.newMessages} color="text-rose-500" bg="bg-rose-50" />
@@ -438,13 +438,13 @@ const SidebarLink = ({ active, onClick, icon, label, badge, badgeColor = "bg-pri
 );
 
 const StatCard = ({ icon, label, value, color, bg }: any) => (
-  <div className="bg-white/80 backdrop-blur-md p-6 rounded-[32px] border border-white shadow-sm flex items-center gap-5 transition-transform hover:scale-[1.02] hover:shadow-lg">
-    <div className={`w-14 h-14 ${bg} ${color} rounded-2xl flex items-center justify-center shadow-inner`}>
-      <span className="material-symbols-outlined text-2xl font-bold">{icon}</span>
+  <div className="bg-white/80 backdrop-blur-md px-2.5 py-3 sm:p-6 rounded-2xl sm:rounded-[32px] border border-white shadow-sm flex flex-col sm:flex-row items-center sm:items-center gap-2 sm:gap-5 text-center sm:text-left transition-transform hover:scale-[1.02] hover:shadow-lg min-w-0">
+    <div className={`w-9 h-9 sm:w-14 sm:h-14 ${bg} ${color} rounded-xl sm:rounded-2xl flex items-center justify-center shadow-inner shrink-0`}>
+      <span className="material-symbols-outlined text-xl sm:text-2xl font-bold">{icon}</span>
     </div>
-    <div>
-      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{label}</p>
-      <p className={`text-2xl font-black ${color}`}>{value}</p>
+    <div className="min-w-0">
+      <p className="text-[8px] sm:text-[10px] font-black text-slate-400 uppercase tracking-wide sm:tracking-widest leading-tight mb-1 line-clamp-2">{label}</p>
+      <p className={`text-xl sm:text-2xl font-black leading-none ${color}`}>{value}</p>
     </div>
   </div>
 );
