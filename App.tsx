@@ -11,9 +11,7 @@ import About from './pages/About';
 import Login from './pages/Login';
 import AdminDashboard from './pages/AdminDashboard';
 import { Page, Prescription, Appointment } from './types';
-import { auth } from './services/firebaseService';
-import { onAuthStateChanged } from "firebase/auth";
-
+import { supabase } from './services/supabaseService';
 
 const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<Page>(Page.HOME);
@@ -23,22 +21,32 @@ const App: React.FC = () => {
   const [authLoaded, setAuthLoaded] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
       setAuthLoaded(true);
-
-      // Si el usuario deja de estar autenticado y está en la página de administración,
-      // lo enviamos de vuelta al inicio.
-      if (!currentUser && currentPage === Page.ADMIN) {
+      if (!session?.user && currentPage === Page.ADMIN) {
         setCurrentPage(Page.HOME);
       }
     });
-    return () => unsubscribe();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      setAuthLoaded(true);
+      if (!session?.user && currentPage === Page.ADMIN) {
+        setCurrentPage(Page.HOME);
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, [currentPage]);
 
-  const handleNavigate = (page: Page) => {
-    // FALLBACK: Usamos auth.currentUser directamente para evitar retardos del estado de React
-    const activeUser = user || auth.currentUser;
+  const handleNavigate = async (page: Page) => {
+    // FALLBACK: Usamos supabase getSession directamente para evitar retardos del estado de React
+    let activeUser = user;
+    if (!activeUser) {
+       const { data: { session } } = await supabase.auth.getSession();
+       activeUser = session?.user ?? null;
+    }
 
     // Protección de ruta: Si intenta ir al ADMIN sin estar logueado, va al LOGIN
     if (page === Page.ADMIN && !activeUser) {

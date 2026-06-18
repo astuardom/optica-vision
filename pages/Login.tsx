@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { loginAdmin } from '../services/firebaseService';
+import { loginAdmin } from '../services/supabaseService';
 
 const Login: React.FC<{ onLoginSuccess: () => void }> = ({ onLoginSuccess }) => {
   const [email, setEmail] = useState('');

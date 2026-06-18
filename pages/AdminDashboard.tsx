@@ -9,8 +9,9 @@ import {
   subscribeToMessages,
   updateMessageStatus,
   deleteMessage
-} from '../services/firebaseService';
+} from '../services/supabaseService';
 import { Prescription, Appointment, Page, ContactMessage } from '../types';
+import CalendarView from '../components/CalendarView';
 
 interface AdminDashboardProps {
   onNavigate?: (page: Page) => void;
@@ -132,10 +133,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
   );
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] flex flex-col lg:flex-row font-sans text-slate-900">
+    <div className="min-h-screen bg-[#f0f4f8] flex flex-col lg:flex-row font-sans text-slate-900 selection:bg-primary/20">
       
       {/* SIDEBAR MODERNO */}
-      <aside className="w-full lg:w-[280px] bg-white border-r border-slate-100 flex flex-col lg:sticky lg:top-0 lg:h-screen z-50">
+      <aside className="w-full lg:w-[280px] bg-white/60 backdrop-blur-xl border-r border-slate-200/50 flex flex-col lg:sticky lg:top-0 lg:h-screen z-50 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
         <div className="p-8">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-primary rounded-2xl flex items-center justify-center shadow-lg shadow-primary/30">
@@ -145,7 +146,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
           </div>
         </div>
 
-        <nav className="flex-grow px-4 space-y-1">
+        <nav className="px-4 space-y-1">
           <div className="px-4 py-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Navegación</div>
           <SidebarLink 
             active={activeTab === 'quotes'} 
@@ -170,13 +171,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
             badge={stats.newMessages > 0 ? stats.newMessages : undefined}
             badgeColor="bg-rose-500"
           />
-        </nav>
 
-        <div className="p-4 border-t border-slate-50">
-          <button onClick={() => logout()} className="w-full flex items-center gap-4 px-5 py-3 rounded-xl text-sm font-bold text-rose-500 hover:bg-rose-50 transition-colors">
-            <span className="material-symbols-outlined text-lg">logout</span> Cerrar Sesión
-          </button>
-        </div>
+          <div className="pt-6 pb-2">
+            <button onClick={() => logout()} className="w-full flex items-center gap-4 px-4 py-3 rounded-2xl text-sm font-bold text-rose-500 hover:bg-rose-50 transition-colors">
+              <span className="material-symbols-outlined text-lg">logout</span> Cerrar Sesión
+            </button>
+          </div>
+        </nav>
       </aside>
 
       {/* ÁREA DE CONTENIDO */}
@@ -212,187 +213,202 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
             </div>
           </div>
 
-          <div className="bg-white p-2 rounded-2xl border border-slate-100 shadow-sm inline-flex items-center gap-1">
-             <FilterBtn active={statusFilter === 'all'} label="Todos" onClick={() => setStatusFilter('all')} />
-             {activeTab === 'quotes' && (
-               <>
-                 <FilterBtn active={statusFilter === 'Pendiente'} label="Pendientes" onClick={() => setStatusFilter('Pendiente')} />
-                 <FilterBtn active={statusFilter === 'Contactado'} label="Contactados" onClick={() => setStatusFilter('Contactado')} />
-                 <FilterBtn active={statusFilter === 'Finalizado'} label="Finalizados" onClick={() => setStatusFilter('Finalizado')} />
-               </>
-             )}
-             {activeTab === 'appointments' && (
-               <>
-                 <FilterBtn active={statusFilter === 'pendiente'} label="Pendientes" onClick={() => setStatusFilter('pendiente')} />
-                 <FilterBtn active={statusFilter === 'realizado'} label="Atendidos" onClick={() => setStatusFilter('realizado')} />
-                 <FilterBtn active={statusFilter === 'no_asistio'} label="No Asistió" onClick={() => setStatusFilter('no_asistio')} />
-               </>
-             )}
-             {activeTab === 'messages' && (
-               <>
-                 <FilterBtn active={statusFilter === 'new'} label="Sin Leer" onClick={() => setStatusFilter('new')} />
-                 <FilterBtn active={statusFilter === 'read'} label="Leídos" onClick={() => setStatusFilter('read')} />
-               </>
-             )}
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 animate-fade-in">
-            {filteredData.length > 0 ? (
-              filteredData.map((item: any) => (
-                <DataCard 
-                  key={item.id} 
-                  type={activeTab} 
-                  data={item} 
-                  onSelect={() => {
-                    if (activeTab === 'quotes') setSelectedQuote(item);
-                    else if (activeTab === 'appointments') setSelectedAppointment(item);
-                    else setSelectedMessage(item);
-                  }}
-                />
-              ))
-            ) : (
-              <div className="col-span-full py-20 flex flex-col items-center justify-center bg-white rounded-[40px] border border-slate-100 border-dashed">
-                 <div className="w-20 h-20 bg-slate-50 text-slate-300 rounded-full flex items-center justify-center mb-4">
-                    <span className="material-symbols-outlined text-4xl">inventory_2</span>
-                 </div>
-                 <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">No hay registros con estos filtros</p>
+          {activeTab === 'appointments' ? (
+            <CalendarView 
+              appointments={appointments} 
+              onSelectAppointment={setSelectedAppointment} 
+            />
+          ) : (
+            <>
+              <div className="bg-white p-2 rounded-2xl border border-slate-100 shadow-sm inline-flex items-center gap-1">
+                <FilterBtn active={statusFilter === 'all'} label="Todos" onClick={() => setStatusFilter('all')} />
+                {activeTab === 'quotes' && (
+                  <>
+                    <FilterBtn active={statusFilter === 'Pendiente'} label="Pendientes" onClick={() => setStatusFilter('Pendiente')} />
+                    <FilterBtn active={statusFilter === 'Contactado'} label="Contactados" onClick={() => setStatusFilter('Contactado')} />
+                    <FilterBtn active={statusFilter === 'Finalizado'} label="Finalizados" onClick={() => setStatusFilter('Finalizado')} />
+                  </>
+                )}
+                {activeTab === 'messages' && (
+                  <>
+                    <FilterBtn active={statusFilter === 'new'} label="Sin Leer" onClick={() => setStatusFilter('new')} />
+                    <FilterBtn active={statusFilter === 'read'} label="Leídos" onClick={() => setStatusFilter('read')} />
+                  </>
+                )}
               </div>
-            )}
-          </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 animate-fade-in">
+                {filteredData.length > 0 ? (
+                  filteredData.map((item: any) => (
+                    <DataCard 
+                      key={item.id} 
+                      type={activeTab} 
+                      data={item} 
+                      onSelect={() => {
+                        if (activeTab === 'quotes') setSelectedQuote(item);
+                        else setSelectedMessage(item);
+                      }}
+                    />
+                  ))
+                ) : (
+                  <div className="col-span-full py-20 flex flex-col items-center justify-center bg-white rounded-[40px] border border-slate-100 border-dashed">
+                     <div className="w-20 h-20 bg-slate-50 text-slate-300 rounded-full flex items-center justify-center mb-4">
+                        <span className="material-symbols-outlined text-4xl">inventory_2</span>
+                     </div>
+                     <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">No hay registros con estos filtros</p>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
         </div>
       </main>
 
       {/* DRAWERS */}
       
-      {/* Detalle Mensaje */}
-      <Drawer isOpen={!!selectedMessage} onClose={() => setSelectedMessage(null)} title="Mensaje de Cliente">
+      {/* Modales */}
+      <Modal isOpen={!!selectedMessage} onClose={() => setSelectedMessage(null)} title="Mensaje de Cliente">
         {selectedMessage && (
-          <div className="space-y-8">
-            <div className={`flex items-center gap-4 p-6 rounded-3xl ${selectedMessage.status === 'new' ? 'bg-rose-50 border border-rose-100' : 'bg-slate-50 border border-slate-100'}`}>
-              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center font-black text-xl text-white ${selectedMessage.status === 'new' ? 'bg-rose-500' : 'bg-slate-400'}`}>
+          <div className="space-y-6">
+            <div className={`flex items-center gap-5 p-6 rounded-3xl backdrop-blur-md shadow-sm border ${selectedMessage.status === 'new' ? 'bg-rose-50/80 border-rose-100/50' : 'bg-slate-50/80 border-slate-100/50'}`}>
+              <div className={`w-16 h-16 rounded-[20px] flex items-center justify-center font-black text-2xl text-white shadow-inner ${selectedMessage.status === 'new' ? 'bg-gradient-to-br from-rose-400 to-rose-600' : 'bg-gradient-to-br from-slate-300 to-slate-500'}`}>
                 {selectedMessage.nombre?.charAt(0).toUpperCase()}
               </div>
-              <div>
-                <h3 className="font-black text-lg">{selectedMessage.nombre}</h3>
-                <p className="text-sm text-slate-500 font-medium">{selectedMessage.email}</p>
+              <div className="flex-1">
+                <h3 className="font-black text-xl text-slate-800">{selectedMessage.nombre}</h3>
+                <p className="text-sm text-slate-500 font-bold flex items-center gap-1.5"><span className="material-symbols-outlined text-[16px]">mail</span> {selectedMessage.email}</p>
+              </div>
+              <div className="text-right">
+                <StatusBadge status={selectedMessage.status} />
               </div>
             </div>
-            <div className="space-y-3">
-              <div className="p-6 bg-white border border-slate-100 rounded-3xl shadow-sm italic text-slate-700 leading-relaxed">
-                "{selectedMessage.mensaje}"
+            
+            <div className="p-6 bg-white/60 border border-slate-100/50 rounded-3xl shadow-sm relative">
+              <span className="material-symbols-outlined absolute top-4 left-4 text-4xl text-slate-200 opacity-50">format_quote</span>
+              <p className="text-lg text-slate-700 leading-relaxed font-medium pl-8 relative z-10">"{selectedMessage.mensaje}"</p>
+              <div className="mt-4 pt-4 border-t border-slate-100/50 flex justify-between items-center text-xs font-bold text-slate-400">
+                <span>Recibido vía Web</span>
+                <span>{new Date(selectedMessage.date).toLocaleString()}</span>
               </div>
-              <p className="text-[10px] text-slate-400 font-bold px-4">Recibido el {new Date(selectedMessage.date).toLocaleString()}</p>
             </div>
-            <div className="grid grid-cols-1 gap-3 pt-6">
-              <a href={`mailto:${selectedMessage.email}`} onClick={() => handleMessageStatus(selectedMessage.id!, 'read')} className="w-full h-14 bg-primary text-white font-black rounded-2xl shadow-lg flex items-center justify-center gap-3 hover:bg-primary-hover transition-all">
-                <span className="material-symbols-outlined">reply</span> RESPONDER POR EMAIL
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
+              <a href={`mailto:${selectedMessage.email}`} onClick={() => handleMessageStatus(selectedMessage.id!, 'read')} className="h-14 bg-gradient-to-r from-primary to-blue-600 text-white font-black rounded-2xl shadow-lg shadow-primary/20 flex items-center justify-center gap-2 hover:scale-[1.02] transition-transform">
+                <span className="material-symbols-outlined">reply</span> RESPONDER EMAIL
               </a>
-              <div className="flex gap-3">
+              <div className="flex gap-2">
                 {selectedMessage.status === 'new' && (
-                  <button onClick={() => handleMessageStatus(selectedMessage.id!, 'read')} className="flex-grow h-12 border border-slate-200 text-slate-600 font-bold rounded-xl hover:bg-slate-50">MARCAR LEÍDO</button>
+                  <button onClick={() => handleMessageStatus(selectedMessage.id!, 'read')} className="flex-1 h-14 bg-white border border-slate-200 text-slate-600 font-bold rounded-2xl hover:bg-slate-50 transition-colors shadow-sm">LEÍDO</button>
                 )}
-                <button onClick={() => handleDeleteMessage(selectedMessage.id!)} className="h-12 w-full border border-rose-100 text-rose-500 font-bold flex items-center justify-center gap-2 rounded-xl hover:bg-rose-50 transition-colors">
-                  <span className="material-symbols-outlined text-lg">delete</span> ELIMINAR MENSAJE
+                <button onClick={() => handleDeleteMessage(selectedMessage.id!)} className={`${selectedMessage.status === 'new' ? 'w-14' : 'flex-1'} h-14 bg-rose-50 border border-rose-100 text-rose-500 font-bold flex items-center justify-center rounded-2xl hover:bg-rose-100 transition-colors shadow-sm`} title="Eliminar Mensaje">
+                  <span className="material-symbols-outlined text-xl">delete</span>
+                  {selectedMessage.status !== 'new' && <span className="ml-2">ELIMINAR</span>}
                 </button>
               </div>
             </div>
           </div>
         )}
-      </Drawer>
+      </Modal>
 
-      {/* Detalle Cita */}
-      <Drawer isOpen={!!selectedAppointment} onClose={() => setSelectedAppointment(null)} title="Gestión de Cita">
+      <Modal isOpen={!!selectedAppointment} onClose={() => setSelectedAppointment(null)} title="Detalle de la Cita">
         {selectedAppointment && (
-          <div className="space-y-8">
-             <div className={`p-6 border rounded-3xl ${selectedAppointment.status === 'pendiente' ? 'bg-amber-50 border-amber-100' : selectedAppointment.status === 'realizado' ? 'bg-emerald-50 border-emerald-100' : 'bg-rose-50 border-rose-100'}`}>
-                <div className="flex justify-between items-start mb-4">
-                  <span className={`font-black text-[10px] uppercase tracking-widest ${selectedAppointment.status === 'pendiente' ? 'text-amber-600' : selectedAppointment.status === 'realizado' ? 'text-emerald-600' : 'text-rose-600'}`}>
-                    {selectedAppointment.status}
-                  </span>
-                  <span className={`material-symbols-outlined ${selectedAppointment.status === 'pendiente' ? 'text-amber-500' : selectedAppointment.status === 'realizado' ? 'text-emerald-500' : 'text-rose-500'}`}>event</span>
-                </div>
-                <h3 className="text-xl font-black">{selectedAppointment.paciente}</h3>
-                <p className="text-sm font-bold opacity-70 mt-1">{selectedAppointment.fecha} a las {selectedAppointment.hora} hrs</p>
-             </div>
-             
-             <div className="space-y-4">
-                <div className="flex items-center gap-4 text-sm font-bold text-slate-600">
-                  <span className="material-symbols-outlined text-primary">call</span> {selectedAppointment.telefono}
-                </div>
-                <div className="flex items-center gap-4 text-sm font-bold text-slate-600">
-                  <span className="material-symbols-outlined text-primary">eyeglasses</span> {selectedAppointment.tipoAtencion}
-                </div>
+          <div className="space-y-6">
+             <div className="flex flex-col sm:flex-row gap-6">
+               <div className={`flex-1 p-6 border rounded-3xl backdrop-blur-md shadow-sm ${selectedAppointment.status === 'pendiente' ? 'bg-amber-50/80 border-amber-100/50' : selectedAppointment.status === 'realizado' ? 'bg-emerald-50/80 border-emerald-100/50' : 'bg-rose-50/80 border-rose-100/50'}`}>
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="material-symbols-outlined text-3xl opacity-50 mix-blend-multiply">event</span>
+                    <StatusBadge status={selectedAppointment.status} />
+                  </div>
+                  <h3 className="text-2xl font-black text-slate-800 leading-tight mb-1">{selectedAppointment.paciente}</h3>
+                  <p className="text-sm font-bold opacity-70 flex items-center gap-1.5"><span className="material-symbols-outlined text-[16px]">schedule</span> {selectedAppointment.fecha} a las {selectedAppointment.hora} hrs</p>
+               </div>
+               <div className="sm:w-[200px] flex flex-col gap-3">
+                 <div className="p-4 bg-white/60 border border-slate-100/50 rounded-2xl shadow-sm flex-1 flex flex-col justify-center">
+                    <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1">Teléfono</span>
+                    <span className="text-sm font-bold text-slate-700">{selectedAppointment.telefono || 'No registrado'}</span>
+                 </div>
+                 <div className="p-4 bg-white/60 border border-slate-100/50 rounded-2xl shadow-sm flex-1 flex flex-col justify-center">
+                    <span className="text-[10px] font-black uppercase text-slate-400 tracking-wider mb-1">Motivo</span>
+                    <span className="text-sm font-bold text-slate-700 leading-tight">{selectedAppointment.tipoAtencion}</span>
+                 </div>
+               </div>
              </div>
 
-             <div className="pt-8 border-t space-y-3">
+             <div className="flex gap-3 pt-4 border-t border-slate-100">
                 {selectedAppointment.status !== 'realizado' && (
-                  <button onClick={() => handleAppointmentStatus(selectedAppointment.id!, 'realizado')} className="w-full h-14 bg-emerald-600 text-white font-black rounded-2xl shadow-lg flex items-center justify-center gap-2 hover:bg-emerald-700">
-                    <span className="material-symbols-outlined">check_circle</span> MARCAR COMO ATENDIDO
+                  <button onClick={() => handleAppointmentStatus(selectedAppointment.id!, 'realizado')} className="flex-1 h-14 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-black rounded-2xl shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2 hover:scale-[1.02] transition-transform">
+                    <span className="material-symbols-outlined">check_circle</span> ATENDIDO
                   </button>
                 )}
                 {selectedAppointment.status === 'pendiente' && (
-                  <button onClick={() => handleAppointmentStatus(selectedAppointment.id!, 'no_asistio')} className="w-full h-14 bg-white border-2 border-rose-100 text-rose-500 font-black rounded-2xl hover:bg-rose-50 transition-all">EL PACIENTE NO ASISTIÓ</button>
+                  <button onClick={() => handleAppointmentStatus(selectedAppointment.id!, 'no_asistio')} className="flex-1 h-14 bg-white border-2 border-rose-100 text-rose-500 font-black rounded-2xl hover:bg-rose-50 transition-all shadow-sm">NO ASISTIÓ</button>
                 )}
                 {selectedAppointment.status !== 'pendiente' && (
-                  <button onClick={() => handleAppointmentStatus(selectedAppointment.id!, 'pendiente')} className="w-full h-14 border border-slate-200 text-slate-400 font-bold rounded-2xl hover:bg-slate-50">REVERTIR A PENDIENTE</button>
+                  <button onClick={() => handleAppointmentStatus(selectedAppointment.id!, 'pendiente')} className="flex-1 h-14 bg-white border border-slate-200 text-slate-500 font-bold rounded-2xl hover:bg-slate-50 shadow-sm transition-all">REVERTIR A PENDIENTE</button>
                 )}
              </div>
           </div>
         )}
-      </Drawer>
+      </Modal>
 
-      {/* Detalle Cotización */}
-      <Drawer isOpen={!!selectedQuote} onClose={() => setSelectedQuote(null)} title="Cotización Digital">
+      <Modal isOpen={!!selectedQuote} onClose={() => setSelectedQuote(null)} title="Cotización Digital">
         {selectedQuote && (
-          <div className="space-y-8">
-            <div className="flex items-center justify-between mb-2">
-              <span className="px-3 py-1 bg-primary/10 text-primary font-black text-[10px] rounded-lg tracking-widest">{selectedQuote.folio}</span>
-              <StatusBadge status={selectedQuote.status || 'Pendiente'} />
-            </div>
-            
-            {selectedQuote.imageUrl && (
-              <div className="rounded-3xl overflow-hidden border border-slate-100 shadow-xl group relative">
-                <img src={selectedQuote.imageUrl} className="w-full h-auto" alt="Receta" />
-                <a href={selectedQuote.imageUrl} target="_blank" className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white font-black gap-2">
-                   <span className="material-symbols-outlined">open_in_new</span> VER ORIGINAL
-                </a>
+          <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row gap-6">
+              <div className="flex-1 space-y-6">
+                <div className="flex items-center justify-between">
+                  <span className="px-3 py-1 bg-gradient-to-r from-primary/10 to-blue-500/10 text-primary font-black text-xs rounded-lg tracking-widest border border-primary/20 shadow-sm">FOLIO: {selectedQuote.folio}</span>
+                  <StatusBadge status={selectedQuote.status || 'Pendiente'} />
+                </div>
+                
+                <div className="p-6 bg-slate-50/80 backdrop-blur-md border border-slate-100/50 rounded-3xl shadow-sm">
+                  <h3 className="font-black text-2xl text-slate-800 mb-2">{selectedQuote.nombre}</h3>
+                  <div className="flex flex-col gap-1 text-sm font-bold text-slate-500 mb-6">
+                    <span className="flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">call</span> {selectedQuote.telefono}</span>
+                    <span className="flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">mail</span> {selectedQuote.email}</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                     <div className="p-4 bg-white/80 rounded-2xl border border-slate-100/50 shadow-sm">
+                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider block mb-1">Tipo de Lente</span>
+                        <span className="text-sm font-black text-slate-700">{selectedQuote.tipoLente || 'N/A'}</span>
+                     </div>
+                     <div className="p-4 bg-white/80 rounded-2xl border border-slate-100/50 shadow-sm">
+                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider block mb-1">Material</span>
+                        <span className="text-sm font-black text-slate-700">{selectedQuote.material || 'N/A'}</span>
+                     </div>
+                  </div>
+                </div>
               </div>
-            )}
 
-            <div className="p-6 bg-slate-50 rounded-3xl">
-              <h3 className="font-black text-lg mb-1">{selectedQuote.nombre}</h3>
-              <p className="text-sm font-bold text-slate-500 mb-4">{selectedQuote.email} • {selectedQuote.telefono}</p>
-              <div className="grid grid-cols-2 gap-3">
-                 <div className="p-3 bg-white rounded-xl border border-slate-100">
-                    <span className="text-[8px] font-black text-slate-400 uppercase block mb-1">Lente</span>
-                    <span className="text-xs font-black">{selectedQuote.tipoLente}</span>
-                 </div>
-                 <div className="p-3 bg-white rounded-xl border border-slate-100">
-                    <span className="text-[8px] font-black text-slate-400 uppercase block mb-1">Material</span>
-                    <span className="text-xs font-black">{selectedQuote.material}</span>
-                 </div>
-              </div>
+              {selectedQuote.imageUrl && (
+                <div className="w-full sm:w-[240px] rounded-3xl overflow-hidden border border-slate-100 shadow-xl group relative shrink-0">
+                  <img src={selectedQuote.imageUrl} className="w-full h-full object-cover" alt="Receta Médica" />
+                  <a href={selectedQuote.imageUrl} target="_blank" className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white font-black gap-2">
+                     <span className="material-symbols-outlined">open_in_new</span> VER RECETA
+                  </a>
+                </div>
+              )}
             </div>
 
-            <div className="pt-6 border-t flex flex-col gap-3">
-               <a href={`https://wa.me/${selectedQuote.telefono}`} target="_blank" className="w-full h-14 bg-[#25D366] text-white font-black rounded-2xl flex items-center justify-center gap-3 shadow-lg hover:shadow-[#25D366]/20 transition-all">
-                 <span className="material-symbols-outlined">chat</span> CONTACTAR POR WHATSAPP
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-slate-100/50">
+               <a href={`https://wa.me/${selectedQuote.telefono}`} target="_blank" className="h-14 bg-gradient-to-r from-[#25D366] to-[#1DA851] text-white font-black rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-[#25D366]/20 hover:scale-[1.02] transition-transform">
+                 <span className="material-symbols-outlined">chat</span> CONTACTAR WHATSAPP
                </a>
-               <div className="grid grid-cols-2 gap-2">
+               <div className="flex gap-2">
                  {selectedQuote.status !== 'Finalizado' && (
-                    <button onClick={() => handleQuoteStatus(selectedQuote.id!, 'Finalizado')} className="h-12 bg-emerald-600 text-white font-black rounded-xl hover:bg-emerald-700">MARCAR FINALIZADO</button>
+                    <button onClick={() => handleQuoteStatus(selectedQuote.id!, 'Finalizado')} className="flex-1 h-14 bg-slate-800 text-white font-black rounded-2xl hover:bg-slate-900 shadow-lg transition-all">FINALIZADO</button>
                  )}
                  {selectedQuote.status === 'Pendiente' && (
-                    <button onClick={() => handleQuoteStatus(selectedQuote.id!, 'Contactado')} className="h-12 border border-slate-200 text-slate-600 font-bold rounded-xl hover:bg-slate-50">MARCAR CONTACTADO</button>
+                    <button onClick={() => handleQuoteStatus(selectedQuote.id!, 'Contactado')} className="flex-1 h-14 border border-slate-200 text-slate-600 font-bold rounded-2xl hover:bg-slate-50 shadow-sm">CONTACTADO</button>
                  )}
                  {selectedQuote.status !== 'Pendiente' && (
-                    <button onClick={() => handleQuoteStatus(selectedQuote.id!, 'Pendiente')} className="h-12 border border-slate-200 text-slate-400 font-bold rounded-xl hover:bg-slate-50">VOLVER A PENDIENTE</button>
+                    <button onClick={() => handleQuoteStatus(selectedQuote.id!, 'Pendiente')} className="flex-1 h-14 border border-slate-200 text-slate-400 font-bold rounded-2xl hover:bg-slate-50 shadow-sm">REVERTIR</button>
                  )}
                </div>
             </div>
           </div>
         )}
-      </Drawer>
+      </Modal>
 
     </div>
   );
@@ -422,8 +438,8 @@ const SidebarLink = ({ active, onClick, icon, label, badge, badgeColor = "bg-pri
 );
 
 const StatCard = ({ icon, label, value, color, bg }: any) => (
-  <div className="bg-white p-6 rounded-[32px] border border-slate-100 shadow-sm flex items-center gap-5 transition-transform hover:scale-[1.02]">
-    <div className={`w-14 h-14 ${bg} ${color} rounded-2xl flex items-center justify-center`}>
+  <div className="bg-white/80 backdrop-blur-md p-6 rounded-[32px] border border-white shadow-sm flex items-center gap-5 transition-transform hover:scale-[1.02] hover:shadow-lg">
+    <div className={`w-14 h-14 ${bg} ${color} rounded-2xl flex items-center justify-center shadow-inner`}>
       <span className="material-symbols-outlined text-2xl font-bold">{icon}</span>
     </div>
     <div>
@@ -451,8 +467,8 @@ const DataCard = ({ type, data, onSelect }: any) => {
   return (
     <div 
       onClick={onSelect}
-      className={`group bg-white p-6 rounded-[32px] border shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all cursor-pointer relative overflow-hidden ${
-        isUnreadMessage ? 'border-rose-200 bg-rose-50/20' : 'border-slate-100'
+      className={`group bg-white/80 backdrop-blur-md p-6 rounded-[32px] border shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all cursor-pointer relative overflow-hidden ${
+        isUnreadMessage ? 'border-rose-200 bg-rose-50/40' : 'border-white'
       }`}
     >
       <div className="flex items-center justify-between mb-6">
@@ -507,20 +523,26 @@ const StatusBadge = ({ status }: { status: string }) => {
   );
 };
 
-const Drawer = ({ isOpen, onClose, title, children }: any) => {
+const Modal = ({ isOpen, onClose, title, children }: any) => {
   if (!isOpen) return null;
   return (
     <>
-      <div className="fixed inset-0 z-[100] bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300" onClick={onClose} />
-      <aside className="fixed top-0 right-0 z-[110] h-full w-full sm:w-[500px] bg-white shadow-2xl p-10 overflow-y-auto animate-in slide-in-from-right duration-500 border-l border-slate-100">
-        <div className="flex items-center justify-between mb-10">
-          <h2 className="text-2xl font-black text-slate-800 tracking-tight">{title}</h2>
-          <button onClick={onClose} className="w-12 h-12 hover:bg-slate-50 rounded-2xl flex items-center justify-center transition-colors">
-            <span className="material-symbols-outlined text-slate-400">close</span>
-          </button>
+      <div className="fixed inset-0 z-[100] bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300 flex items-center justify-center p-4 sm:p-6" onClick={onClose}>
+        <div 
+          className="w-full max-w-2xl bg-white/95 backdrop-blur-xl shadow-2xl rounded-[32px] overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-300 border border-white/50 relative"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="flex items-center justify-between p-6 sm:p-8 border-b border-slate-100 bg-white/50">
+            <h2 className="text-2xl font-black text-slate-800 tracking-tight">{title}</h2>
+            <button onClick={onClose} className="w-10 h-10 hover:bg-slate-100 rounded-full flex items-center justify-center transition-colors text-slate-400 hover:text-slate-700">
+              <span className="material-symbols-outlined">close</span>
+            </button>
+          </div>
+          <div className="p-6 sm:p-8 overflow-y-auto custom-scrollbar bg-slate-50/50">
+            {children}
+          </div>
         </div>
-        {children}
-      </aside>
+      </div>
     </>
   );
 };

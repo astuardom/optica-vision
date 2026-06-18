@@ -1,7 +1,6 @@
-
 import React, { useState } from 'react';
 import { Prescription } from '../types';
-import { uploadToCloudinary, saveQuote } from '../services/firebaseService';
+import { saveQuote } from '../services/supabaseService';
 
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxdlA9KA0XHYD5xY9ntGGdESSgQC1NK169Ao1an7lfbzCFTjv94nbpVhYgY7u9q2Ljs8A/exec';
 
@@ -15,19 +14,10 @@ const QuoteForm: React.FC<{ onSubmit: (data: Prescription) => void }> = ({ onSub
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     if (error) setError(null);
-  };
-
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setSelectedFile(file);
-      setError(null);
-    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -36,13 +26,8 @@ const QuoteForm: React.FC<{ onSubmit: (data: Prescription) => void }> = ({ onSub
     setError(null);
 
     try {
-      let imageUrl = '';
-      if (selectedFile) {
-        imageUrl = await uploadToCloudinary(selectedFile);
-      }
-
       const folio = "COT-" + Math.floor(1000 + Math.random() * 9000);
-      const fullData = { ...formData, folio, imageUrl };
+      const fullData = { ...formData, folio };
 
       await saveQuote(fullData);
 
@@ -70,16 +55,6 @@ const QuoteForm: React.FC<{ onSubmit: (data: Prescription) => void }> = ({ onSub
         </div>
 
         <div className="bg-white rounded-[40px] shadow-2xl border border-gray-100 overflow-hidden">
-          <div className="p-8 md:p-12 bg-blue-50/20 border-b border-gray-100">
-            <div className={`relative h-48 flex flex-col items-center justify-center border-2 border-dashed rounded-[32px] transition-all cursor-pointer group bg-white border-primary/30 hover:border-primary`}>
-              <span className="material-symbols-outlined text-5xl text-primary/40 group-hover:text-primary transition-colors mb-2">upload_file</span>
-              <span className="text-sm font-black text-text-main">{selectedFile ? selectedFile.name : 'Adjuntar foto de receta'}</span>
-              <span className="text-[10px] text-text-sub font-bold mt-1 uppercase">Sube tu receta para que nuestros expertos la revisen</span>
-              <input type="file" accept="image/*,application/pdf" onChange={handleFileUpload} className="absolute inset-0 opacity-0 cursor-pointer" />
-            </div>
-          </div>
-
-
           <form onSubmit={handleSubmit} className="p-8 md:p-12 space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {['od', 'oi'].map((side) => (

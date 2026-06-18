@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { saveContactMessage } from '../services/firebaseService';
+import { saveContactMessage } from '../services/supabaseService';
 
 const Contact: React.FC = () => {
   const [formData, setFormData] = useState({

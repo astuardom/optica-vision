@@ -1,7 +1,7 @@
 
 import React, { useMemo, useState } from 'react';
 import { Appointment } from '../types';
-import { saveAppointment } from '../services/firebaseService';
+import { saveAppointment } from '../services/supabaseService';
 
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxdlA9KA0XHYD5xY9ntGGdESSgQC1NK169Ao1an7lfbzCFTjv94nbpVhYgY7u9q2Ljs8A/exec';
 const DEFAULT_SLOTS = ['09:00', '10:00', '11:00', '12:00', '15:00', '16:00', '17:00', '18:00'];
