@@ -13,7 +13,14 @@ export const loginAdmin = async (email: string, pass: string) => {
     email,
     password: pass,
   });
-  if (error) throw error;
+  if (error) {
+    console.error('Supabase login error:', {
+      message: error.message,
+      status: error.status,
+      name: error.name,
+    });
+    throw error;
+  }
   return data;
 };
 

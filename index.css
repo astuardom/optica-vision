@@ -5,7 +5,95 @@
 /* Base styles for Óptica Visión */
 @layer base {
     body {
-        @apply bg-background-light text-text-main font-sans;
+        @apply bg-background-light text-text-main font-sans transition-colors dark:bg-background-dark dark:text-slate-100;
+    }
+
+    .dark input,
+    .dark select,
+    .dark textarea {
+        background-color: #0f172a;
+        border-color: #334155;
+        color: #f1f5f9;
+    }
+
+    .dark input::placeholder,
+    .dark textarea::placeholder {
+        color: #64748b;
+    }
+}
+
+@layer components {
+    .dark .bg-white,
+    .dark .bg-white\/50,
+    .dark .bg-white\/60,
+    .dark .bg-white\/80,
+    .dark .bg-white\/90,
+    .dark .bg-white\/95 {
+        background-color: #0f172a;
+    }
+
+    .dark .bg-background-light,
+    .dark .bg-gray-50,
+    .dark .bg-\[\#f8fafc\],
+    .dark .bg-\[\#f0f4f8\],
+    .dark .bg-\[\#F9FBFF\] {
+        background-color: #101922;
+    }
+
+    .dark .bg-slate-50,
+    .dark .bg-slate-50\/50,
+    .dark .bg-gray-50\/30,
+    .dark .bg-gray-50\/50,
+    .dark .bg-blue-50 {
+        background-color: #1e293b;
+    }
+
+    .dark .text-text-main,
+    .dark .text-slate-800,
+    .dark .text-slate-900 {
+        color: #f1f5f9;
+    }
+
+    .dark .text-text-sub,
+    .dark .text-slate-400,
+    .dark .text-slate-500,
+    .dark .text-slate-600,
+    .dark .text-slate-700,
+    .dark .text-gray-400 {
+        color: #94a3b8;
+    }
+
+    .dark .border-gray-50,
+    .dark .border-gray-100,
+    .dark .border-gray-200,
+    .dark .border-slate-50,
+    .dark .border-slate-100,
+    .dark .border-slate-100\/50,
+    .dark .border-slate-200,
+    .dark .border-white,
+    .dark .border-white\/50 {
+        border-color: #1e293b;
+    }
+
+    .dark .shadow-sm,
+    .dark .shadow-lg,
+    .dark .shadow-xl,
+    .dark .shadow-2xl {
+        box-shadow: 0 18px 45px rgba(0, 0, 0, 0.28);
+    }
+
+    .dark .hover\:bg-gray-50:hover,
+    .dark .hover\:bg-gray-100:hover,
+    .dark .hover\:bg-slate-50:hover {
+        background-color: #1e293b;
+    }
+
+    .dark .bg-primary\/5 {
+        background-color: rgba(19, 127, 236, 0.15);
+    }
+
+    .dark .bg-primary\/10 {
+        background-color: rgba(19, 127, 236, 0.2);
     }
 }
 
@@ -16,6 +104,10 @@
 
 ::-webkit-scrollbar-track {
     background: #f1f1f1;
+}
+
+.dark ::-webkit-scrollbar-track {
+    background: #0f172a;
 }
 
 ::-webkit-scrollbar-thumb {

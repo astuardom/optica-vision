@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Page } from '../types';
 
 interface LayoutProps {
@@ -10,6 +10,15 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children, currentPage, onNavigate }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return localStorage.getItem('theme') !== 'light';
+  });
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', isDarkMode);
+    localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+  }, [isDarkMode]);
 
   const menuItems = [
     { label: 'Inicio', page: Page.HOME },
@@ -25,8 +34,8 @@ const Layout: React.FC<LayoutProps> = ({ children, currentPage, onNavigate }) =>
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100 px-6 lg:px-40 py-4 shadow-sm">
+    <div className="flex flex-col min-h-screen bg-background-light text-text-main transition-colors dark:bg-background-dark dark:text-slate-100">
+      <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100 px-6 lg:px-40 py-4 shadow-sm transition-colors dark:bg-slate-950/90 dark:border-slate-800">
         <div className="flex items-center justify-between max-w-[1280px] mx-auto">
           <div 
             className="flex items-center gap-3 cursor-pointer group" 
@@ -56,18 +65,29 @@ const Layout: React.FC<LayoutProps> = ({ children, currentPage, onNavigate }) =>
             ))}
           </nav>
           
-          {/* Mobile Menu Toggle */}
-          <button 
-            className="lg:hidden p-2 text-text-main hover:bg-gray-100 rounded-lg transition-colors"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          >
-            <span className="material-symbols-outlined">{isMobileMenuOpen ? 'close' : 'menu'}</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              className="p-2 text-text-main hover:bg-gray-100 rounded-lg transition-colors dark:text-slate-100 dark:hover:bg-slate-800"
+              onClick={() => setIsDarkMode((value) => !value)}
+              aria-label={isDarkMode ? 'Activar modo claro' : 'Activar modo oscuro'}
+              title={isDarkMode ? 'Modo claro' : 'Modo oscuro'}
+            >
+              <span className="material-symbols-outlined">{isDarkMode ? 'light_mode' : 'dark_mode'}</span>
+            </button>
+
+            {/* Mobile Menu Toggle */}
+            <button 
+              className="lg:hidden p-2 text-text-main hover:bg-gray-100 rounded-lg transition-colors dark:text-slate-100 dark:hover:bg-slate-800"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              <span className="material-symbols-outlined">{isMobileMenuOpen ? 'close' : 'menu'}</span>
+            </button>
+          </div>
         </div>
 
         {/* Mobile Nav Overlay */}
         {isMobileMenuOpen && (
-          <div className="lg:hidden absolute top-full left-0 w-full bg-white border-b border-gray-100 shadow-xl animate-slide-up">
+          <div className="lg:hidden absolute top-full left-0 w-full bg-white border-b border-gray-100 shadow-xl animate-slide-up dark:bg-slate-950 dark:border-slate-800">
             <nav className="flex flex-col p-6 gap-4">
               {menuItems.map((item) => (
                 <button
@@ -90,7 +110,7 @@ const Layout: React.FC<LayoutProps> = ({ children, currentPage, onNavigate }) =>
         {children}
       </main>
 
-      <footer className="bg-white border-t border-gray-100 py-16 px-6 lg:px-40">
+      <footer className="bg-white border-t border-gray-100 py-16 px-6 lg:px-40 transition-colors dark:bg-slate-950 dark:border-slate-800">
         <div className="max-w-[1280px] mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           <div className="space-y-6">
             <div className="flex items-center gap-2">

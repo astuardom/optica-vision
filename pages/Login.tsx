@@ -16,7 +16,14 @@ const Login: React.FC<{ onLoginSuccess: () => void }> = ({ onLoginSuccess }) => 
       await loginAdmin(email, pass);
       onLoginSuccess();
     } catch (err: any) {
-      setError("Credenciales incorrectas o acceso denegado.");
+      const message = String(err?.message || '').toLowerCase();
+      if (message.includes('invalid login credentials')) {
+        setError('Email o contraseña incorrectos. Revisa que el usuario exista en Supabase Auth.');
+      } else if (message.includes('email not confirmed')) {
+        setError('El email existe, pero falta confirmarlo en Supabase Auth.');
+      } else {
+        setError(err?.message || 'No se pudo iniciar sesión. Revisa la configuración de Supabase.');
+      }
     } finally {
       setLoading(false);
     }
