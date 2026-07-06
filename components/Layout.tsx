@@ -37,7 +37,6 @@ const Layout: React.FC<LayoutProps> = ({ children, currentPage, onNavigate }) =>
     { label: 'Inicio', page: Page.HOME },
     { label: 'Cotizar Receta', page: Page.QUOTE },
     { label: 'Reservar Prueba', page: Page.BOOKING },
-    { label: 'Nosotros', page: Page.ABOUT },
     { label: 'Contacto', page: Page.CONTACT },
   ];
 
@@ -164,7 +163,6 @@ const Layout: React.FC<LayoutProps> = ({ children, currentPage, onNavigate }) =>
           <div className="space-y-6">
             <h4 className="text-xs font-bold uppercase tracking-widest text-text-main">Empresa</h4>
             <nav className="flex flex-col gap-3">
-              <button onClick={() => onNavigate(Page.ABOUT)} className="text-sm text-text-sub hover:text-primary text-left transition-colors">Nosotros</button>
               <button onClick={() => onNavigate(Page.CONTACT)} className="text-sm text-text-sub hover:text-primary text-left transition-colors">Sucursales</button>
               <button onClick={() => onNavigate(Page.BOOKING)} className="text-sm text-text-sub hover:text-primary text-left transition-colors">Reserva tu Prueba</button>
               <button onClick={() => onNavigate(Page.ADMIN)} className="text-sm text-text-sub hover:text-primary text-left transition-colors flex items-center gap-2 italic">

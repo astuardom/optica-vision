@@ -43,8 +43,8 @@ const QuoteForm: React.FC<{ onSubmit: (data: Prescription) => void }> = ({ onSub
     <div className="py-12 px-6 lg:px-40 bg-background-light animate-slide-up min-h-screen">
       <div className="max-w-[850px] mx-auto">
         <div className="mb-10 text-center">
-          <h1 className="text-4xl font-black text-text-main mb-2 tracking-tight">Cotizador <span className="text-primary">Cloud</span></h1>
-          <p className="text-text-sub font-medium">Sube tu receta e ingresa los datos manualmente.</p>
+          <h1 className="text-4xl font-black text-text-main mb-2 tracking-tight">Cotizador de <span className="text-primary">Lentes</span></h1>
+          <p className="text-text-sub font-medium">Ingresa los datos de tu receta y te contactamos con la mejor opción para ti.</p>
         </div>
 
         <div className="bg-white rounded-[40px] shadow-2xl border border-gray-100 overflow-hidden">
