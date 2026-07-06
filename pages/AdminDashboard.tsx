@@ -361,25 +361,57 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                 <div className="flex items-center justify-between">
                   <span className="px-3 py-1 bg-gradient-to-r from-primary/10 to-blue-500/10 text-primary font-black text-xs rounded-lg tracking-widest border border-primary/20 shadow-sm">FOLIO: {selectedQuote.folio}</span>
                   <StatusBadge status={selectedQuote.status || 'Pendiente'} />
-                </div>
-                
-                <div className="p-6 bg-slate-50/80 backdrop-blur-md border border-slate-100/50 rounded-3xl shadow-sm">
-                  <h3 className="font-black text-2xl text-slate-800 mb-2">{selectedQuote.nombre}</h3>
-                  <div className="flex flex-col gap-1 text-sm font-bold text-slate-500 mb-6">
-                    <span className="flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">call</span> {selectedQuote.telefono}</span>
-                    <span className="flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">mail</span> {selectedQuote.email}</span>
+                </div>                 <div className="p-6 bg-slate-50/80 backdrop-blur-md border border-slate-100/50 rounded-3xl shadow-sm space-y-4">
+                  <div>
+                    <h3 className="font-black text-2xl text-slate-800 mb-2">{selectedQuote.nombre}</h3>
+                    <div className="flex flex-col gap-1 text-sm font-bold text-slate-500">
+                      <span className="flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">call</span> {selectedQuote.telefono}</span>
+                      <span className="flex items-center gap-2"><span className="material-symbols-outlined text-[16px]">mail</span> {selectedQuote.email}</span>
+                    </div>
                   </div>
+
+                  {/* Datos Ópticos (Receta Manual) */}
+                  <div className="grid grid-cols-2 gap-3 pt-2 border-t border-slate-200/50">
+                    <div className="p-3 bg-white/80 rounded-xl border border-slate-100 shadow-sm">
+                      <span className="text-[9px] font-black text-primary uppercase block mb-1">Ojo Derecho (OD)</span>
+                      <div className="text-xs text-slate-700 font-bold space-y-0.5">
+                        <p>Esf: <span className="text-slate-900 font-black">{selectedQuote.od_esfera || '0.00'}</span></p>
+                        <p>Cil: <span className="text-slate-900 font-black">{selectedQuote.od_cilindro || '0.00'}</span></p>
+                        <p>Eje: <span className="text-slate-900 font-black">{selectedQuote.od_eje || '—'}</span></p>
+                      </div>
+                    </div>
+                    <div className="p-3 bg-white/80 rounded-xl border border-slate-100 shadow-sm">
+                      <span className="text-[9px] font-black text-primary uppercase block mb-1">Ojo Izquierdo (OI)</span>
+                      <div className="text-xs text-slate-700 font-bold space-y-0.5">
+                        <p>Esf: <span className="text-slate-900 font-black">{selectedQuote.oi_esfera || '0.00'}</span></p>
+                        <p>Cil: <span className="text-slate-900 font-black">{selectedQuote.oi_cilindro || '0.00'}</span></p>
+                        <p>Eje: <span className="text-slate-900 font-black">{selectedQuote.oi_eje || '—'}</span></p>
+                      </div>
+                    </div>
+                  </div>
+
                   <div className="grid grid-cols-2 gap-3">
-                     <div className="p-4 bg-white/80 rounded-2xl border border-slate-100/50 shadow-sm">
-                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider block mb-1">Tipo de Lente</span>
-                        <span className="text-sm font-black text-slate-700">{selectedQuote.tipoLente || 'N/A'}</span>
+                     <div className="p-3.5 bg-white/80 rounded-xl border border-slate-100 shadow-sm">
+                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider block mb-1">Distancia Pupilar</span>
+                        <span className="text-xs font-black text-slate-700">{selectedQuote.distancia_pupilar || '—'}</span>
                      </div>
-                     <div className="p-4 bg-white/80 rounded-2xl border border-slate-100/50 shadow-sm">
-                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider block mb-1">Material</span>
-                        <span className="text-sm font-black text-slate-700">{selectedQuote.material || 'N/A'}</span>
+                     <div className="p-3.5 bg-white/80 rounded-xl border border-slate-100 shadow-sm">
+                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider block mb-1">Adición</span>
+                        <span className="text-xs font-black text-slate-700">{selectedQuote.adicion || '—'}</span>
                      </div>
                   </div>
-                </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                     <div className="p-3.5 bg-white/80 rounded-xl border border-slate-100 shadow-sm">
+                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider block mb-1">Tipo de Lente</span>
+                        <span className="text-xs font-black text-slate-700">{selectedQuote.tipoLente || 'N/A'}</span>
+                     </div>
+                     <div className="p-3.5 bg-white/80 rounded-xl border border-slate-100 shadow-sm">
+                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider block mb-1">Material</span>
+                        <span className="text-xs font-black text-slate-700">{selectedQuote.material || 'N/A'}</span>
+                     </div>
+                  </div>
+                </div>            </div>
               </div>
 
               {selectedQuote.imageUrl && (
