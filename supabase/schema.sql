@@ -57,25 +57,64 @@ ALTER TABLE appointments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE quotes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
 
--- Políticas para Appointments
--- 1. Cualquiera puede crear (insertar) una cita (acceso anónimo)
-CREATE POLICY "Permitir insertar citas a cualquiera" ON appointments FOR INSERT WITH CHECK (true);
--- 2. Solo administradores autenticados pueden ver, editar o borrar
-CREATE POLICY "Permitir leer citas a autenticados" ON appointments FOR SELECT USING (auth.role() = 'authenticated');
-CREATE POLICY "Permitir actualizar citas a autenticados" ON appointments FOR UPDATE USING (auth.role() = 'authenticated');
-CREATE POLICY "Permitir eliminar citas a autenticados" ON appointments FOR DELETE USING (auth.role() = 'authenticated');
+-- ===========================================================
+-- POLÍTICAS PARA APPOINTMENTS
+-- ===========================================================
+-- Cualquiera (anónimo) puede crear una cita
+CREATE POLICY "Permitir insertar citas a cualquiera"
+  ON appointments FOR INSERT
+  WITH CHECK (true);
 
--- Políticas para Quotes
-CREATE POLICY "Permitir insertar cotizaciones a cualquiera" ON quotes FOR INSERT WITH CHECK (true);
-CREATE POLICY "Permitir leer cotizaciones a autenticados" ON quotes FOR SELECT USING (auth.role() = 'authenticated');
-CREATE POLICY "Permitir actualizar cotizaciones a autenticados" ON quotes FOR UPDATE USING (auth.role() = 'authenticated');
-CREATE POLICY "Permitir eliminar cotizaciones a autenticados" ON quotes FOR DELETE USING (auth.role() = 'authenticated');
+-- Solo usuarios autenticados pueden leer, editar o borrar
+CREATE POLICY "Permitir leer citas a autenticados"
+  ON appointments FOR SELECT
+  USING ((select auth.uid()) IS NOT NULL);
 
--- Políticas para Messages
-CREATE POLICY "Permitir insertar mensajes a cualquiera" ON messages FOR INSERT WITH CHECK (true);
-CREATE POLICY "Permitir leer mensajes a autenticados" ON messages FOR SELECT USING (auth.role() = 'authenticated');
-CREATE POLICY "Permitir actualizar mensajes a autenticados" ON messages FOR UPDATE USING (auth.role() = 'authenticated');
-CREATE POLICY "Permitir eliminar mensajes a autenticados" ON messages FOR DELETE USING (auth.role() = 'authenticated');
+CREATE POLICY "Permitir actualizar citas a autenticados"
+  ON appointments FOR UPDATE
+  USING ((select auth.uid()) IS NOT NULL);
+
+CREATE POLICY "Permitir eliminar citas a autenticados"
+  ON appointments FOR DELETE
+  USING ((select auth.uid()) IS NOT NULL);
+
+-- ===========================================================
+-- POLÍTICAS PARA QUOTES
+-- ===========================================================
+CREATE POLICY "Permitir insertar cotizaciones a cualquiera"
+  ON quotes FOR INSERT
+  WITH CHECK (true);
+
+CREATE POLICY "Permitir leer cotizaciones a autenticados"
+  ON quotes FOR SELECT
+  USING ((select auth.uid()) IS NOT NULL);
+
+CREATE POLICY "Permitir actualizar cotizaciones a autenticados"
+  ON quotes FOR UPDATE
+  USING ((select auth.uid()) IS NOT NULL);
+
+CREATE POLICY "Permitir eliminar cotizaciones a autenticados"
+  ON quotes FOR DELETE
+  USING ((select auth.uid()) IS NOT NULL);
+
+-- ===========================================================
+-- POLÍTICAS PARA MESSAGES
+-- ===========================================================
+CREATE POLICY "Permitir insertar mensajes a cualquiera"
+  ON messages FOR INSERT
+  WITH CHECK (true);
+
+CREATE POLICY "Permitir leer mensajes a autenticados"
+  ON messages FOR SELECT
+  USING ((select auth.uid()) IS NOT NULL);
+
+CREATE POLICY "Permitir actualizar mensajes a autenticados"
+  ON messages FOR UPDATE
+  USING ((select auth.uid()) IS NOT NULL);
+
+CREATE POLICY "Permitir eliminar mensajes a autenticados"
+  ON messages FOR DELETE
+  USING ((select auth.uid()) IS NOT NULL);
 
 -- Activar Realtime para la tabla de messages (para que el dashboard se actualice solo)
-alter publication supabase_realtime add table messages;
+ALTER PUBLICATION supabase_realtime ADD TABLE messages;

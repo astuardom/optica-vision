@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Prescription } from '../types';
 import { saveQuote } from '../services/supabaseService';
 
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxdlA9KA0XHYD5xY9ntGGdESSgQC1NK169Ao1an7lfbzCFTjv94nbpVhYgY7u9q2Ljs8A/exec';
+const APPS_SCRIPT_URL = import.meta.env.VITE_APPS_SCRIPT_URL || '';
 
 const QuoteForm: React.FC<{ onSubmit: (data: Prescription) => void }> = ({ onSubmit }) => {
   const [formData, setFormData] = useState<Prescription>({

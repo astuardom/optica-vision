@@ -1,11 +1,13 @@
 
 import React, { useEffect, useState } from 'react';
 import { Page } from '../types';
+import { supabase } from '../services/supabaseService';
 
 interface LayoutProps {
   children: React.ReactNode;
   currentPage: Page;
   onNavigate: (page: Page) => void;
+  user?: any;
 }
 
 const Layout: React.FC<LayoutProps> = ({ children, currentPage, onNavigate }) => {
@@ -14,6 +16,17 @@ const Layout: React.FC<LayoutProps> = ({ children, currentPage, onNavigate }) =>
     if (typeof window === 'undefined') return false;
     return localStorage.getItem('theme') !== 'light';
   });
+  const [currentUser, setCurrentUser] = useState<any>(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setCurrentUser(session?.user ?? null);
+    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setCurrentUser(session?.user ?? null);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', isDarkMode);
@@ -66,6 +79,19 @@ const Layout: React.FC<LayoutProps> = ({ children, currentPage, onNavigate }) =>
           </nav>
           
           <div className="flex items-center gap-2">
+            {/* Botón Ingresar / Panel — Desktop */}
+            <button
+              onClick={() => onNavigate(currentUser ? Page.ADMIN : Page.LOGIN)}
+              className={`hidden lg:flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all ${
+                currentUser
+                  ? 'bg-primary/10 text-primary hover:bg-primary hover:text-white'
+                  : 'bg-primary text-white hover:bg-primary/90 shadow-md shadow-primary/20'
+              }`}
+            >
+              <span className="material-symbols-outlined text-lg">{currentUser ? 'dashboard' : 'login'}</span>
+              {currentUser ? 'Panel' : 'Ingresar'}
+            </button>
+
             <button
               className="p-2 text-text-main hover:bg-gray-100 rounded-lg transition-colors dark:text-slate-100 dark:hover:bg-slate-800"
               onClick={() => setIsDarkMode((value) => !value)}
@@ -101,6 +127,19 @@ const Layout: React.FC<LayoutProps> = ({ children, currentPage, onNavigate }) =>
                   <span className="material-symbols-outlined text-sm">chevron_right</span>
                 </button>
               ))}
+              {/* Botón Ingresar / Panel — Mobile */}
+              <button
+                onClick={() => handleMobileNav(currentUser ? Page.ADMIN : Page.LOGIN)}
+                className={`flex items-center justify-between p-4 rounded-xl font-bold text-left transition-colors ${
+                  currentUser ? 'bg-primary/5 text-primary' : 'bg-primary text-white'
+                }`}
+              >
+                <span className="flex items-center gap-3">
+                  <span className="material-symbols-outlined text-lg">{currentUser ? 'dashboard' : 'login'}</span>
+                  {currentUser ? 'Panel de Gestión' : 'Ingresar'}
+                </span>
+                <span className="material-symbols-outlined text-sm">chevron_right</span>
+              </button>
             </nav>
           </div>
         )}

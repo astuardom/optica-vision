@@ -17,12 +17,11 @@ const Login: React.FC<{ onLoginSuccess: () => void }> = ({ onLoginSuccess }) => 
       onLoginSuccess();
     } catch (err: any) {
       const message = String(err?.message || '').toLowerCase();
-      if (message.includes('invalid login credentials')) {
-        setError('Email o contraseña incorrectos. Revisa que el usuario exista en Supabase Auth.');
-      } else if (message.includes('email not confirmed')) {
-        setError('El email existe, pero falta confirmarlo en Supabase Auth.');
+      if (message.includes('email not confirmed')) {
+        setError('Tu cuenta requiere confirmación. Revisa tu correo electrónico.');
       } else {
-        setError(err?.message || 'No se pudo iniciar sesión. Revisa la configuración de Supabase.');
+        // Mensaje genérico para no revelar si el email existe (user enumeration)
+        setError('Credenciales incorrectas. Verifica tu email y contraseña.');
       }
     } finally {
       setLoading(false);

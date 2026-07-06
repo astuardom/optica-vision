@@ -68,15 +68,6 @@ const App: React.FC = () => {
   };
 
   const renderPage = () => {
-    // Mientras carga la autenticación en una ruta protegida, mostramos un loader
-    if (currentPage === Page.ADMIN && !authLoaded) {
-      return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-        </div>
-      );
-    }
-
     switch (currentPage) {
       case Page.HOME:
         return <Home onNavigate={handleNavigate} />;
@@ -92,14 +83,26 @@ const App: React.FC = () => {
         return <Contact />;
       case Page.ABOUT:
         return <About onNavigate={handleNavigate} />;
-      case Page.LOGIN:
-        return <Login onLoginSuccess={() => handleNavigate(Page.ADMIN)} />;
-      case Page.ADMIN:
-        return <AdminDashboard onNavigate={handleNavigate} />;
       default:
         return <Home onNavigate={handleNavigate} />;
     }
   };
+
+  // Páginas con layout propio — se renderizan sin el navbar/footer
+  if (currentPage === Page.ADMIN) {
+    if (!authLoaded) {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      );
+    }
+    return <AdminDashboard onNavigate={handleNavigate} />;
+  }
+
+  if (currentPage === Page.LOGIN) {
+    return <Login onLoginSuccess={() => handleNavigate(Page.ADMIN)} />;
+  }
 
   return (
     <Layout currentPage={currentPage} onNavigate={handleNavigate}>

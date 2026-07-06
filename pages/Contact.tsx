@@ -120,6 +120,7 @@ const Contact: React.FC = () => {
                       value={formData.nombre}
                       onChange={handleChange}
                       required
+                      maxLength={100}
                       className="w-full rounded-lg border-gray-200 bg-gray-50 focus:bg-white transition-colors" 
                       placeholder="Ej: Juan Pérez" 
                     />
@@ -132,6 +133,7 @@ const Contact: React.FC = () => {
                       value={formData.email}
                       onChange={handleChange}
                       required
+                      maxLength={150}
                       className="w-full rounded-lg border-gray-200 bg-gray-50 focus:bg-white transition-colors" 
                       placeholder="tu@correo.com" 
                     />
@@ -143,6 +145,7 @@ const Contact: React.FC = () => {
                       value={formData.mensaje}
                       onChange={handleChange}
                       required
+                      maxLength={2000}
                       rows={4} 
                       className="w-full rounded-lg border-gray-200 bg-gray-50 focus:bg-white transition-colors" 
                       placeholder="Escribe tu consulta aquí..."
