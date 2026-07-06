@@ -29,6 +29,29 @@ export const logout = async () => {
   if (error) throw error;
 };
 
+// SUBIR IMAGEN DE RECETA A SUPABASE STORAGE
+export const uploadQuoteImage = async (file: File): Promise<string> => {
+  const fileExt = file.name.split('.').pop();
+  const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
+  const filePath = `recipes/${fileName}`;
+
+  // Intenta subir la imagen al bucket 'optica-assets'
+  const { data, error } = await supabase.storage
+    .from('optica-assets')
+    .upload(filePath, file);
+
+  if (error) {
+    throw new Error('Error al subir la imagen a Supabase Storage: ' + error.message);
+  }
+
+  // Obtiene la URL pública del archivo
+  const { data: { publicUrl } } = supabase.storage
+    .from('optica-assets')
+    .getPublicUrl(filePath);
+
+  return publicUrl;
+};
+
 // FIRESTORE -> SUPABASE CITAS
 export const saveAppointment = async (appointment: any) => {
   const { data, error } = await supabase

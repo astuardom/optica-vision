@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Prescription } from '../types';
-import { saveQuote } from '../services/supabaseService';
+import { saveQuote, uploadQuoteImage } from '../services/supabaseService';
 
 
 const QuoteForm: React.FC<{ onSubmit: (data: Prescription) => void }> = ({ onSubmit }) => {
@@ -11,12 +11,30 @@ const QuoteForm: React.FC<{ onSubmit: (data: Prescription) => void }> = ({ onSub
     tipoLente: 'Monofocal', material: 'Orgánico Standard',
     nombre: '', telefono: '', email: ''
   });
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [filePreview, setFilePreview] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     if (error) setError(null);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setSelectedFile(file);
+      setFilePreview(URL.createObjectURL(file));
+      if (error) setError(null);
+    }
+  };
+
+  const handleRemoveFile = () => {
+    setSelectedFile(null);
+    setFilePreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -26,14 +44,21 @@ const QuoteForm: React.FC<{ onSubmit: (data: Prescription) => void }> = ({ onSub
 
     try {
       const folio = "COT-" + Math.floor(1000 + Math.random() * 9000);
-      const fullData = { ...formData, folio };
+      let imageUrl = '';
+
+      if (selectedFile) {
+        imageUrl = await uploadQuoteImage(selectedFile);
+      }
+
+      const fullData = { ...formData, folio, imageUrl };
 
       await saveQuote(fullData);
 
       const waUrl = `https://wa.me/56912345678?text=Hola! Mi folio de cotización es ${folio}. Mi nombre es ${formData.nombre}`;
       onSubmit({ ...fullData, whatsappUrl: waUrl });
     } catch (error: any) {
-      setError("Error al procesar la solicitud. Revisa tu conexión.");
+      console.error(error);
+      setError(error.message || "Error al procesar la solicitud. Revisa tu conexión.");
     } finally {
       setSubmitting(false);
     }
@@ -88,7 +113,53 @@ const QuoteForm: React.FC<{ onSubmit: (data: Prescription) => void }> = ({ onSub
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-6">
+            {/* SECCIÓN SUBIR RECETA */}
+            <div className="pt-6 border-t border-gray-50 space-y-4">
+              <label className="text-[10px] font-black text-text-sub uppercase tracking-widest px-2">Sube tu Receta Médica (Opcional)</label>
+              
+              {!filePreview ? (
+                <div 
+                  onClick={() => fileInputRef.current?.click()}
+                  className="border-2 border-dashed border-gray-200 hover:border-primary/50 transition-colors rounded-[24px] p-8 flex flex-col items-center justify-center gap-3 cursor-pointer group bg-gray-50/50"
+                >
+                  <div className="w-12 h-12 rounded-2xl bg-white border border-gray-100 flex items-center justify-center text-text-sub group-hover:text-primary group-hover:scale-110 transition-all shadow-sm">
+                    <span className="material-symbols-outlined text-2xl">upload_file</span>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-sm font-bold text-text-main">Haz clic para subir una imagen</p>
+                    <p className="text-xs text-text-sub mt-1">Soporta PNG, JPG, JPEG</p>
+                  </div>
+                  <input 
+                    type="file" 
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                    accept="image/*" 
+                    className="hidden" 
+                  />
+                </div>
+              ) : (
+                <div className="relative rounded-[24px] border border-gray-100 overflow-hidden bg-gray-50 flex items-center justify-between p-4 shadow-sm animate-zoom-in">
+                  <div className="flex items-center gap-4">
+                    <div className="w-16 h-16 rounded-xl overflow-hidden border border-gray-200 bg-white">
+                      <img src={filePreview} alt="Vista previa de receta" className="w-full h-full object-cover" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-text-main line-clamp-1">{selectedFile?.name}</p>
+                      <p className="text-xs text-text-sub mt-0.5">{(selectedFile!.size / 1024 / 1024).toFixed(2)} MB</p>
+                    </div>
+                  </div>
+                  <button 
+                    type="button"
+                    onClick={handleRemoveFile}
+                    className="w-10 h-10 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-500 flex items-center justify-center transition-colors shadow-sm"
+                  >
+                    <span className="material-symbols-outlined text-xl">delete</span>
+                  </button>
+                </div>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-6 border-t border-gray-50">
               <div className="space-y-4">
                 <input type="text" name="nombre" placeholder="Nombre completo" value={formData.nombre} onChange={handleChange} required className="w-full h-14 rounded-2xl border-gray-100 px-6 font-bold text-sm focus:ring-primary" />
                 <input type="tel" name="telefono" placeholder="WhatsApp" value={formData.telefono} onChange={handleChange} required className="w-full h-14 rounded-2xl border-gray-100 px-6 font-bold text-sm focus:ring-primary" />
