@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Prescription } from '../types';
 import { saveQuote } from '../services/supabaseService';
 
-const APPS_SCRIPT_URL = import.meta.env.VITE_APPS_SCRIPT_URL || '';
 
 const QuoteForm: React.FC<{ onSubmit: (data: Prescription) => void }> = ({ onSubmit }) => {
   const [formData, setFormData] = useState<Prescription>({
@@ -30,12 +29,6 @@ const QuoteForm: React.FC<{ onSubmit: (data: Prescription) => void }> = ({ onSub
       const fullData = { ...formData, folio };
 
       await saveQuote(fullData);
-
-      fetch(APPS_SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        body: JSON.stringify({ action: 'cotizar', ...fullData })
-      }).catch(err => console.error("Apps Script Error:", err));
 
       const waUrl = `https://wa.me/56912345678?text=Hola! Mi folio de cotización es ${folio}. Mi nombre es ${formData.nombre}`;
       onSubmit({ ...fullData, whatsappUrl: waUrl });

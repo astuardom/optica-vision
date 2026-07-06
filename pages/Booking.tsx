@@ -3,7 +3,6 @@ import React, { useMemo, useState } from 'react';
 import { Appointment } from '../types';
 import { saveAppointment } from '../services/supabaseService';
 
-const APPS_SCRIPT_URL = import.meta.env.VITE_APPS_SCRIPT_URL || '';
 const DEFAULT_SLOTS = ['09:00', '10:00', '11:00', '12:00', '15:00', '16:00', '17:00', '18:00'];
 const DAYS_OF_WEEK = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
 const MONTHS = [
@@ -72,13 +71,6 @@ const Booking: React.FC<{ onSubmit: (data: Appointment) => void }> = ({ onSubmit
 
       await saveAppointment(appointmentData);
       
-      // Notificación opcional vía Apps Script
-      fetch(APPS_SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        body: JSON.stringify({ action: 'agenda', ...formData, fecha: appointmentData.fecha, hora: appointmentData.hora })
-      }).catch(() => {});
-
       onSubmit(appointmentData);
     } catch (err: any) {
       setErrorMsg('No se pudo completar la reserva. Reintenta.');
