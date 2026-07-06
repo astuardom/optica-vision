@@ -411,7 +411,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
                         <span className="text-xs font-black text-slate-700">{selectedQuote.material || 'N/A'}</span>
                      </div>
                   </div>
-                </div>            </div>
+                </div>
               </div>
 
               {selectedQuote.imageUrl && (
